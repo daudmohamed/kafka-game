@@ -8,7 +8,7 @@ on:
         required: true
   workflow_dispatch:
 
-run-name: Dev deploy of ${{ github.ref_name }}
+run-name: deploy of ${{ github.ref_name }}
 env:
   REGISTRY: registry.daud.dev
   IMAGE_NAME: ${{ github.repository }}
