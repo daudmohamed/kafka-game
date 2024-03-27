@@ -6,7 +6,7 @@ ktor:
         port: 8080
 
 database:
-    embedded: false
+    embedded: true
     host: localhost
     port: 5432
     databaseName: 'kafka'
