@@ -1,0 +1,36 @@
+version: 2
+updates:
+  - package-ecosystem: "gradle"
+    directory: "/"
+    schedule:
+      interval: "daily"
+    open-pull-requests-limit: 10
+    ignore:
+      # Versions follow the Postgres version and should be updated manually
+      - dependency-name: io.zonky.test.postgres:embedded-postgres-binaries-bom
+      # We want to stay on the apache versions instead of confluent's (dependabot does not support regex in versions yet.)
+      - dependency-name: org.apache.kafka:kafka-clients
+        versions:
+          - "*-ce"
+          - "*-ccs"
+  - package-ecosystem: "docker"
+    directory: "/"
+    schedule:
+      interval: "daily"
+  - package-ecosystem: "github-actions"
+    directory: "/"
+    schedule:
+      interval: "daily"
+  # Default it only picks up .github/workflows, but we put custom actions in .github/actions
+  - package-ecosystem: "github-actions"
+    directory: "/.github/actions/build-and-test"
+    schedule:
+      interval: "daily"
+  - package-ecosystem: "github-actions"
+    directory: "/.github/actions/push-image"
+    schedule:
+      interval: "daily"
+  - package-ecosystem: "github-actions"
+    directory: "/.github/actions/setup-java"
+    schedule:
+      interval: "daily"

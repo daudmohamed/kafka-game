@@ -1,0 +1,6 @@
+name: "CodeQL"
+
+paths-ignore:
+  - '**/gradle/**'
+  - '**/.gradle/**'
+  - "**/build/"
