@@ -11,6 +11,7 @@ import kotlin.test.*
 class ApplicationTest {
     @Test
     fun testRoot() = testApplication {
+        System.setProperty("RUNNING_IN_TEST", "true")
         application {
             val teamRepository = TeamRepository()
             configureRouting(teamRepository, true)

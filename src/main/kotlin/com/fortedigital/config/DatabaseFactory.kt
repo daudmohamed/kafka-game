@@ -32,7 +32,8 @@ class DatabaseFactory(
     }
 
     private fun hikari(): HikariDataSource {
-        if (embedded) {
+        val isRunningInTest = System.getProperty("RUNNING_IN_TEST") != null
+        if (isRunningInTest || embedded) {
             return HikariDataSource().apply {
                 dataSourceClassName = JdbcDataSource::class.qualifiedName
                 addDataSourceProperty("url", "jdbc:h2:mem:kafka-game;DB_CLOSE_DELAY=-1")
