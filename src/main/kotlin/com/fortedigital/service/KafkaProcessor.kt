@@ -1,13 +1,12 @@
 package com.fortedigital.service
 
-import com.fortedigital.config.consumerProps
 import com.fortedigital.dto.TeamDTO
 import com.fortedigital.repository.*
 import com.fortedigital.service.formats.*
-import io.ktor.server.http.*
 import io.ktor.util.logging.*
 import kotlinx.datetime.Instant
 import kotlinx.serialization.json.Json
+import org.apache.kafka.clients.consumer.ConsumerConfig
 import org.apache.kafka.clients.consumer.KafkaConsumer
 import org.apache.kafka.common.errors.WakeupException
 import java.time.Duration
@@ -15,8 +14,23 @@ import java.util.*
 import java.util.concurrent.atomic.AtomicBoolean
 
 
-class KafkaProcessor(private val questionRepository: QuestionRepository, private val answerRepository: AnswerRepository, private val teamRepository: TeamRepository) {
+class KafkaProcessor(
+    private val bootstrapServers: String,
+    private val questionRepository: QuestionRepository,
+    private val answerRepository: AnswerRepository,
+    private val teamRepository: TeamRepository
+) {
     private val logger = KtorSimpleLogger("KafkaProcessor")
+    private val consumerProps =
+        mapOf(
+            ConsumerConfig.BOOTSTRAP_SERVERS_CONFIG to bootstrapServers,
+            ConsumerConfig.AUTO_OFFSET_RESET_CONFIG to "earliest",
+            ConsumerConfig.KEY_DESERIALIZER_CLASS_CONFIG to "org.apache.kafka.common.serialization.StringDeserializer",
+            ConsumerConfig.VALUE_DESERIALIZER_CLASS_CONFIG to "org.apache.kafka.common.serialization.ByteArrayDeserializer",
+            ConsumerConfig.GROUP_ID_CONFIG to "Admin",
+            ConsumerConfig.ENABLE_AUTO_COMMIT_CONFIG to "false",
+        )
+
     private val consumer = KafkaConsumer<String, ByteArray>(consumerProps)
     private val closed = AtomicBoolean(false) // Add this line
 

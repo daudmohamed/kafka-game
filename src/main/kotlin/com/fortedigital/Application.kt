@@ -2,7 +2,6 @@ package com.fortedigital
 
 import com.fortedigital.config.configureRouting
 import com.fortedigital.config.configureSerialization
-import com.fortedigital.config.consumerProps
 import com.fortedigital.repository.AnswerRepository
 import com.fortedigital.repository.DatabaseFactory
 import com.fortedigital.repository.QuestionRepository
@@ -10,8 +9,6 @@ import com.fortedigital.repository.TeamRepository
 import com.fortedigital.service.KafkaProcessor
 import io.ktor.server.application.*
 import kotlinx.coroutines.launch
-import kotlinx.coroutines.runBlocking
-import org.apache.kafka.clients.consumer.KafkaConsumer
 
 fun main(args: Array<String>) {
     io.ktor.server.netty.EngineMain.main(args)
@@ -33,7 +30,9 @@ fun Application.module() {
     val answerRepository = AnswerRepository()
     configureRouting(teamRepository)
 
+    val bootstrapServers = environment.config.property("kafka.bootstrap.servers").getString()
     launch {
-        KafkaProcessor(questionRepository,answerRepository, teamRepository).apply { run() }
+
+        KafkaProcessor(bootstrapServers, questionRepository,answerRepository, teamRepository).apply { run() }
     }
 }
