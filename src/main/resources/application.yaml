@@ -5,7 +5,7 @@ ktor:
     deployment:
         port: 8080
 kafka:
-    bootstrapServers: 'kafka-0:19092'
+    bootstrap-servers: 'kafka-0:19092'
 
 database:
     embedded: false

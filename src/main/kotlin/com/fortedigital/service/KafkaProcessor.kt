@@ -15,7 +15,7 @@ import java.util.concurrent.atomic.AtomicBoolean
 
 
 class KafkaProcessor(
-    private val bootstrapServers: String,
+    bootstrapServers: String,
     private val questionRepository: QuestionRepository,
     private val answerRepository: AnswerRepository,
     private val teamRepository: TeamRepository

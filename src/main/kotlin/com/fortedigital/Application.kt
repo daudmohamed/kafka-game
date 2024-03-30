@@ -30,9 +30,13 @@ fun Application.module() {
     val answerRepository = AnswerRepository()
     configureRouting(teamRepository)
 
-    val bootstrapServers = environment.config.property("kafka.bootstrap.servers").getString()
-    launch {
+    val isRunningInTest = System.getProperty("RUNNING_IN_TEST") != null
+    if (!isRunningInTest) {
+        val bootstrapServers = environment.config.property("kafka.bootstrap-servers").getString()
+        launch {
 
-        KafkaProcessor(bootstrapServers, questionRepository,answerRepository, teamRepository).apply { run() }
+            KafkaProcessor(bootstrapServers, questionRepository,answerRepository, teamRepository).apply { run() }
+        }
     }
+
 }
