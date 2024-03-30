@@ -1,12 +1,9 @@
 name: Build and push Docker image
 
 on:
-  workflow_call:
-    secrets:
-      NAIS_WORKLOAD_IDENTITY_PROVIDER:
-        description: "Identity provider for nais/docker-build-push"
-        required: true
-  workflow_dispatch:
+  push:
+    branches:
+      - 'main'
 
 run-name: deploy of ${{ github.ref_name }}
 env:
@@ -44,6 +41,7 @@ jobs:
         run: ./gradlew test build
 
   push-image:
+    needs: [ build ]
     runs-on: ubuntu-latest
     # Sets the permissions granted to the `GITHUB_TOKEN` for the actions in this job.
     permissions:
@@ -74,4 +72,4 @@ jobs:
           context: .
           push: true
           tags: ${{ steps.meta.outputs.tags }}
-          labels: ${{ steps.meta.outputs.labels }}
+          labels: ${{ steps.meta.outputs.labels }}, ${{ steps.meta.outputs.labels }}:latest
