@@ -8,6 +8,7 @@ import kotlinx.datetime.Instant
 import kotlinx.serialization.json.Json
 import org.apache.kafka.clients.consumer.ConsumerConfig
 import org.apache.kafka.clients.consumer.KafkaConsumer
+import org.apache.kafka.common.Uuid
 import org.apache.kafka.common.errors.WakeupException
 import java.time.Duration
 import java.util.*
@@ -27,7 +28,7 @@ class KafkaProcessor(
             ConsumerConfig.AUTO_OFFSET_RESET_CONFIG to "earliest",
             ConsumerConfig.KEY_DESERIALIZER_CLASS_CONFIG to "org.apache.kafka.common.serialization.StringDeserializer",
             ConsumerConfig.VALUE_DESERIALIZER_CLASS_CONFIG to "org.apache.kafka.common.serialization.ByteArrayDeserializer",
-            ConsumerConfig.GROUP_ID_CONFIG to "Admin",
+            ConsumerConfig.GROUP_ID_CONFIG to "admin-"+ Uuid.randomUuid(),
             ConsumerConfig.ENABLE_AUTO_COMMIT_CONFIG to "false",
         )
 

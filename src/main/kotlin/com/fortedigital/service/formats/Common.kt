@@ -43,11 +43,11 @@ enum class Category(val score: Int) {
     @SerialName("team-registration")
     TEAM_REGISTRATION(5), // 1 TASK
     @SerialName("ping-pong")
-    PING_PONG(10), // 10 TASKS
+    PING_PONG(10), // 5 TASKS
     @SerialName("arithmetic")
-    ARITHMETIC(20), // 20 TASKS
+    ARITHMETIC(20), // 10 TASKS
     @SerialName("base64")
-    BASE_64(30), // 5 TASKS
+    BASE_64(30), // 10 TASKS
     @SerialName("is-a-prime")
     PRIME_NUMBER(50), // 10 TASKS
     @SerialName("transactions")
