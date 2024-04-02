@@ -99,5 +99,4 @@ jobs:
       - uses: actions-ecosystem/action-push-tag@v1
         with:
           tag: ${{ steps.bump-semver.outputs.new_version }}
-          token: ${{ secrets.ACTIONS_GITHUB_TOKEN }}
 
