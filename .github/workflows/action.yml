@@ -87,6 +87,16 @@ jobs:
         run: |
           git config user.name "GitHub Actions Bot"
           git config user.email "<>"
-      - uses: rickstaa/action-update-semver@v1
+      - uses: actions-ecosystem/action-get-latest-tag@v1
+        id: get-latest-tag
+
+      - uses: actions-ecosystem/action-bump-semver@v1
+        id: bump-semver
         with:
-          major_version_tag_only: true # (optional, default is "false")
+          current_version: ${{ steps.get-latest-tag.outputs.tag }}
+          level: minor
+
+      - uses: actions-ecosystem/action-push-tag@v1
+        with:
+          tag: ${{ steps.bump-semver.outputs.new_version }}
+          message: '${{ steps.bump-semver.outputs.new_version }}
