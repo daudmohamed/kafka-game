@@ -73,3 +73,20 @@ jobs:
           push: true
           tags: ${{ steps.meta.outputs.tags }}, registry.daud.dev/daudmohamed/kafka-game:latest
           labels: ${{ steps.meta.outputs.labels }}
+
+  update-tag:
+    needs: [ push-image ]
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          repository: kafka-game-deploy
+          ref: 'main'
+          token: ${{ secrets.ACTIONS_GITHUB_TOKEN }}
+      - name: setup git config
+        run: |
+          git config user.name "GitHub Actions Bot"
+          git config user.email "<>"
+      - uses: rickstaa/action-update-semver@v1
+        with:
+          major_version_tag_only: true # (optional, default is "false")
