@@ -74,13 +74,13 @@ jobs:
           tags: ${{ steps.meta.outputs.tags }}, registry.daud.dev/daudmohamed/kafka-game:latest
           labels: ${{ steps.meta.outputs.labels }}
 
-  update-tag:
+  deploy:
     needs: [ push-image ]
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
         with:
-          repository: kafka-game-deploy
+          repository: daudmohamed/kafka-game-deploy
           ref: 'main'
           token: ${{ secrets.ACTIONS_GITHUB_TOKEN }}
       - name: setup git config
