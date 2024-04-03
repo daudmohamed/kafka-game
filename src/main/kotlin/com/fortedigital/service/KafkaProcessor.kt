@@ -141,7 +141,7 @@ class KafkaProcessor(
         // create team
         val team = TeamDTO(0, teamRegistration.teamName, 0, teamRegistration.answer, emptyList())
         val id = teamRepository.create(team)
-        logger.info("Team created with id: $id")
+        logger.info("Team created with id: $id and name: ${teamRegistration.teamName}")
         val answer = Answer(
             0,
             id,
@@ -152,7 +152,7 @@ class KafkaProcessor(
             teamRegistration.created,
         )
         val create = answerRepository.create(answer)
-        logger.info("Answer created with id: $create")
+        logger.info("Answer created with id: $create for team: ${teamRegistration.teamName}")
     }
 
     private suspend fun handlePingPong(message: String) {
@@ -176,7 +176,7 @@ class KafkaProcessor(
             pingPong.created,
         )
         val create = answerRepository.create(answer)
-        logger.info("Answer created with id: $create")
+        logger.info("Answer created with id: $create for team: ${pingPong.teamName}")
     }
 
     private suspend fun handleArithmetic(message: String) {
@@ -218,7 +218,7 @@ class KafkaProcessor(
         )
 
         val create = answerRepository.create(answerEntity)
-        logger.info("Answer created with id: $create")
+        logger.info("Answer created with id: $create for team: ${arithmetic.teamName}")
     }
 
 
@@ -249,7 +249,7 @@ class KafkaProcessor(
             base64.created,
         )
         val create = answerRepository.create(answer)
-        logger.info("Answer created with id: $create")
+        logger.info("Answer created with id: $create for team: ${base64.teamName}")
     }
 
     private suspend fun handlePrimeNumber(message: String) {
@@ -283,7 +283,7 @@ class KafkaProcessor(
             prime.created,
         )
         val create = answerRepository.create(answer)
-        logger.info("Answer created with id: $create")
+        logger.info("Answer created with id: $create for team: ${prime.teamName}")
     }
 
     private fun isPrime(value: Int): Any? {
@@ -336,7 +336,7 @@ class KafkaProcessor(
             transactions.created,
         )
         val create = answerRepository.create(answer)
-        logger.info("Answer created with id: $create")
+        logger.info("Answer created with id: $create for team: ${transactions.teamName}")
     }
 
     private suspend fun handleMinMax(message: String) {
@@ -378,7 +378,7 @@ class KafkaProcessor(
         )
 
         val create = answerRepository.create(answer)
-        logger.info("Answer created with id: $create")
+        logger.info("Answer created with id: $create for team: ${minMax.teamName}")
     }
 
     private suspend fun handleDeduplication(message: String) {
@@ -398,7 +398,9 @@ class KafkaProcessor(
                     deduplication.category,
                     deduplication.created,
                 )
-                answerRepository.create(answer)
+                val create = answerRepository.create(answer)
+                logger.info("Answer created with id: $create for team: ${deduplication.teamName}")
+
             }
             "you duped me!" -> {
                 answerRepository.deleteByQuestionId(deduplication.questionId)
@@ -409,6 +411,7 @@ class KafkaProcessor(
             }
         }
         if (!answerValue.contentEquals("you wont dupe me!")) {
+            logError(deduplication.teamName, "Answer is not correct")
             logger.error("Answer is not correct")
             return
         }
@@ -417,6 +420,8 @@ class KafkaProcessor(
 
     private suspend inline fun<reified T: CommonMessage> handleCommon(message: String): T? {
         val answer = jsonMapper.decodeFromString<T>(message)
+        logger.info("Handling message from team: ${answer.teamName} for category: ${answer.category}")
+
         val questionsExistsForAnswer = questionsExistsForAnswer(answer.questionId)
         if (!questionsExistsForAnswer) {
             logError(answer.teamName, "Question does not exist for this answer")
