@@ -230,7 +230,7 @@ class KafkaProcessor(
         // check if decoded value matches with value in question
         val question = questionRepository.getByQuestionId(base64.questionId)
 
-        val expectedValue = question!!.question.split(" ")[1]
+        val expectedValue = question!!.question.split("echo ")[1]
         if (expectedValue != String(decodedAnswer)) {
             logError(base64.teamName, "Answer is not correct")
             return
