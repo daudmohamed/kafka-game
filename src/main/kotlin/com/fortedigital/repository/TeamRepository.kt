@@ -44,11 +44,11 @@ class Team(
         val deduplicationCategory = CategoryScoreDTO(Category.DEDUPLICATION.ordinal, Category.DEDUPLICATION, deduplicationScore, deduplicationCount, hasError)
         categoryAnswers = categoryAnswers.plus(deduplicationCategory)
 
-        Category.entries.forEach {
+        /*Category.entries.forEach {
             if (categoryAnswers.none { categoryScoreDTO -> categoryScoreDTO.category == it }) {
                 categoryAnswers = categoryAnswers.plus(CategoryScoreDTO(it.ordinal, it, 0, 0, false))
             }
-        }
+        }*/
 
         val score = 0 + answers.sumOf { it.score }
         return TeamDTO(id, name, score,"#FF0000", categoryAnswers)
