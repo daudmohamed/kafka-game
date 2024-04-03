@@ -58,7 +58,7 @@ class Team(
             }
         }*/
 
-        val score = 0 + answers.sumOf { it.score }
+        val score = 0 + categoryAnswers.sumOf { it.totalScore }
         return TeamDTO(id, name, score,"#FF0000", categoryAnswers)
     }
 }
