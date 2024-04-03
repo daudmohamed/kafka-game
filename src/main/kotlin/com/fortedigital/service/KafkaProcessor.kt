@@ -130,12 +130,12 @@ class KafkaProcessor(
         // determine if answer is a hex-color
         val hexColorRegex = Regex("^#([A-Fa-f0-9]{6}|[A-Fa-f0-9]{3})$")
         if (!hexColorRegex.matches(teamRegistration.answer)) {
-            logger.error("Answer is not a hex-color")
+            logError(teamRegistration.teamName, "Answer is not a hex-color")
             return
         }
         // check if team already exists
         if (teamRepository.checkIfTeamExists(teamRegistration.teamName)) {
-            logger.error("Team already exists")
+            logError(teamRegistration.teamName, "Team already exists")
             return
         }
         // create team
@@ -158,7 +158,7 @@ class KafkaProcessor(
     private suspend fun handlePingPong(message: String) {
         val pingPong = handleCommon<AnswerMessage>(message) ?: return
         if (pingPong.answer != "pong") {
-            logger.error("Answer is not ping")
+            logError(pingPong.teamName, "Answer is not pong")
             return
         }
 
@@ -182,7 +182,7 @@ class KafkaProcessor(
     private suspend fun handleArithmetic(message: String) {
         val arithmetic = handleCommon<AnswerMessage>(message) ?: return
         val answerValue = arithmetic.answer.toIntOrNull() ?: run {
-            logger.error("Answer is not a number")
+            logError(arithmetic.teamName, "Answer is not a number")
             return
         }
 
@@ -195,13 +195,13 @@ class KafkaProcessor(
             (mathFunction.split("*").size == 2) -> mathFunction.split("*")[0].trim().toInt() * mathFunction.split("*")[1].trim().toInt()
             (mathFunction.split("/").size == 2) -> mathFunction.split("/")[0].trim().toInt() / mathFunction.split("/")[1].trim().toInt()
             else -> {
-                logger.error("Unknown math function")
+                logError(arithmetic.teamName, "Unknown math function")
                 return
             }
         }
 
         if (expectedValue != answerValue) {
-            logger.error("Answer is not correct")
+            logError(arithmetic.teamName, "Answer is not correct")
             return
         }
 
@@ -232,7 +232,7 @@ class KafkaProcessor(
 
         val expectedValue = question!!.question.split(" ")[1]
         if (expectedValue != String(decodedAnswer)) {
-            logger.error("Answer is not correct")
+            logError(base64.teamName, "Answer is not correct")
             return
         }
 
@@ -258,7 +258,7 @@ class KafkaProcessor(
             "true" -> true
             "false" -> false
             else -> {
-                logger.error("Answer is not true or false")
+                logError(prime.teamName, "Answer is not true or false")
                 return
             }
         }
@@ -267,7 +267,7 @@ class KafkaProcessor(
         val question = questionRepository.getByQuestionId(prime.questionId)
         val value = question!!.question.split("?")[1].trim().toInt()
         if (isPrime != isPrime(value)) {
-            logger.error("Answer is not correct")
+            logError(prime.teamName, "Answer is not correct")
             return
         }
 
@@ -302,7 +302,7 @@ class KafkaProcessor(
         val transactions = handleCommon<AnswerMessage>(message) ?: return
         val currentBalance = transactions.answer.toIntOrNull()
         if (currentBalance == null) {
-            logger.error("Answer is not a number")
+            logError(transactions.teamName, "Answer is not a number")
             return
         }
 
@@ -321,7 +321,7 @@ class KafkaProcessor(
 
 
         if (currentBalance != expectedBalance) {
-            logger.error("Answer is not correct")
+            logError(transactions.teamName, "Answer is not correct")
             return
         }
 
@@ -343,7 +343,7 @@ class KafkaProcessor(
         val minMax = handleCommon<AnswerMessage>(message) ?: return
         val answerValue = minMax.answer.toIntOrNull()
         if (answerValue == null) {
-            logger.error("Answer is not a number")
+            logError(minMax.teamName, "Answer is not a number")
             return
         }
 
@@ -355,13 +355,13 @@ class KafkaProcessor(
             "HOYESTE" -> values.max()
             "LAVESTE" -> values.min()
             else -> {
-                logger.error("Unknown question")
+                logError(minMax.teamName, "Unknown HOYESTE/LAVESTE value")
                 return
             }
         }
 
         if (answerValue != expectedValue) {
-            logger.error("Answer is not correct")
+            logError(minMax.teamName, "Answer is not correct")
             return
         }
 
@@ -404,7 +404,7 @@ class KafkaProcessor(
                 answerRepository.deleteByQuestionId(deduplication.questionId)
             }
             else -> {
-                logger.error("Answer is not correct")
+                logError(deduplication.teamName, "Answer is not correct")
                 return
             }
         }
@@ -419,19 +419,19 @@ class KafkaProcessor(
         val answer = jsonMapper.decodeFromString<T>(message)
         val questionsExistsForAnswer = questionsExistsForAnswer(answer.questionId)
         if (!questionsExistsForAnswer) {
-            logger.error("Question does not exist for this answer")
+            logError(answer.teamName, "Question does not exist for this answer")
             return null
         }
 
         val byMessageId = answerRepository.getByMessageId(answer.messageId)
         if (byMessageId != null) {
-            logger.error("Answer already exists")
+            logError(answer.teamName, "Answer already exists")
             return null
         }
 
         if (answer !is AnswerMessage) {
             if (!teamRepository.checkIfTeamExists(answer.teamName)) {
-                logger.error("Team does not exists")
+                logError(answer.teamName, "Team does not exists")
                 return null
             }
         }
@@ -443,6 +443,10 @@ class KafkaProcessor(
         val byQuestionId = questionRepository.getByQuestionId(questionsId)
 
         return byQuestionId != null
+    }
+
+    private fun logError(teamName: String, message: String) {
+        logger.error(message, "teamName", teamName)
     }
 
 }
