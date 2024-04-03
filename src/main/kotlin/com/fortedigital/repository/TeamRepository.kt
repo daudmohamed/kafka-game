@@ -29,20 +29,28 @@ class Team(
 
         var deduplicationAnswers = answers.filter { it.category == Category.DEDUPLICATION }
             .groupBy { it.questionId }
-        var hasError = false
-        var deduplicationScore = 0
-        var deduplicationCount = 0
-        deduplicationAnswers
-            .forEach { (_, a) ->
-                if (a.size > 1) {
-                    hasError = true
-                } else {
-                    deduplicationScore += a.sumOf { it.score }
-                    deduplicationCount++
+        if (deduplicationAnswers.isNotEmpty()) {
+            var hasError = false
+            var deduplicationScore = 0
+            var deduplicationCount = 0
+            deduplicationAnswers
+                .forEach { (_, a) ->
+                    if (a.size > 1) {
+                        hasError = true
+                    } else {
+                        deduplicationScore += a.sumOf { it.score }
+                        deduplicationCount++
+                    }
                 }
+            val deduplicationCategory: CategoryScoreDTO?
+            if (hasError) {
+                deduplicationCategory = CategoryScoreDTO(Category.DEDUPLICATION.ordinal, Category.DEDUPLICATION, 0, 0, hasError)
+            } else {
+                deduplicationCategory = CategoryScoreDTO(Category.DEDUPLICATION.ordinal, Category.DEDUPLICATION, deduplicationScore, deduplicationCount, hasError)
             }
-        val deduplicationCategory = CategoryScoreDTO(Category.DEDUPLICATION.ordinal, Category.DEDUPLICATION, deduplicationScore, deduplicationCount, hasError)
-        categoryAnswers = categoryAnswers.plus(deduplicationCategory)
+            categoryAnswers = categoryAnswers.plus(deduplicationCategory)
+        }
+
 
         /*Category.entries.forEach {
             if (categoryAnswers.none { categoryScoreDTO -> categoryScoreDTO.category == it }) {
