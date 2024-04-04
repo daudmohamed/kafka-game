@@ -9,7 +9,8 @@ data class TeamDTO(
     val name: String,
     val score: Int,
     val hexColor: String,
-    val answers: List<CategoryScoreDTO>
+    val answers: List<CategoryScoreDTO>,
+    val highestAnswerId: Int
 )
 
 

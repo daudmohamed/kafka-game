@@ -139,7 +139,7 @@ class KafkaProcessor(
             return
         }
         // create team
-        val team = TeamDTO(0, teamRegistration.teamName, 0, teamRegistration.answer, emptyList())
+        val team = TeamDTO(0, teamRegistration.teamName, 0, teamRegistration.answer, emptyList(), 0)
         val id = teamRepository.create(team)
         logger.info("Team created with id: $id and name: ${teamRegistration.teamName}")
         val answer = Answer(

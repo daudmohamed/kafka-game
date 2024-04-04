@@ -14,9 +14,10 @@ import org.jetbrains.exposed.sql.transactions.transaction
 class Team(
     val id: Int,
     private val name: String,
+    private val hexColor: String,
     val answers: List<AnswerDTO>,
 )  {
-    constructor(id: Int, name: String) : this(id, name, emptyList())
+    constructor(id: Int, name: String, hexColor: String) : this(id, name, hexColor, emptyList())
 
     fun toDTO(): TeamDTO {
         val distinctAnswers = answers.distinctBy { it.questionId }
@@ -59,7 +60,9 @@ class Team(
         }*/
 
         val score = 0 + categoryAnswers.sumOf { it.totalScore }
-        return TeamDTO(id, name, score,"#FF0000", categoryAnswers)
+
+        val highestAnswerId = answers.maxByOrNull { it.id }?.id ?: 0
+        return TeamDTO(id, name, score,hexColor, categoryAnswers, highestAnswerId)
     }
 }
 class TeamRepository {
@@ -70,10 +73,12 @@ class TeamRepository {
         fun toModel(it: ResultRow) = Team(
             it[id].value,
             it[name],
+            it[hexColor]
         )
         fun toModel(it: ResultRow, toList: List<AnswerDTO>) = Team(
             it[id].value,
             it[name],
+            it[hexColor],
             toList
         )
     }
@@ -81,6 +86,7 @@ class TeamRepository {
     suspend fun create(team: TeamDTO): Int = dbQuery {
         TeamTable.insertAndGetId {
             it[name] = team.name
+            it[hexColor] = team.hexColor
         }.value
     }
 

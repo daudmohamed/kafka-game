@@ -17,7 +17,7 @@ class Answer (
     val category: Category,
     val created: String,
 )  {
-    fun toDTO() = AnswerDTO(category, score, questionId)
+    fun toDTO() = AnswerDTO(id, category, score, questionId)
 }
 class AnswerRepository {
      object AnswerTable : IntIdTable() {
