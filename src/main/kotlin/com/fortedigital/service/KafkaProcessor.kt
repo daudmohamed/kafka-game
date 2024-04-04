@@ -101,6 +101,9 @@ class KafkaProcessor(
                 Category.DEDUPLICATION -> {
                     handleDeduplication(message)
                 }
+                Category.MODULUS -> {
+                    handleModulus(message)
+                }
                 else -> {
                     logger.error("Unknown category: ${commonObject.category}")
                 }
@@ -415,6 +418,55 @@ class KafkaProcessor(
             logger.error("Answer is not correct")
             return
         }
+    }
+
+
+    private suspend fun handleModulus(message: String) {
+        val modulus = handleCommon<AnswerMessage>(message) ?: return
+        val isValid = when(modulus.answer) {
+            "true" -> true
+            "false" -> false
+            else -> {
+                logError(modulus.teamName, "Answer is not true or false")
+                return
+            }
+        }
+
+        // check if value in question is prime
+        val question = questionRepository.getByQuestionId(modulus.questionId)
+        val value = question!!.question.split(" ")[1].trim().toString()
+        // Solution 2
+        val a: String = StringBuilder(value.replace(".", ""))
+            .reverse()
+            .toString()
+        val control = a.substring(0, 1)
+        val digits = a.substring(1)
+        var sum = 0
+        for (i in 0 until digits.length) {
+            val weight = (i % 6) + 2
+            sum += (weight * digits[i].digitToIntOrNull()!!) ?: -1
+        }
+
+
+        if (isValid != (11 - (sum % 11) == control.toInt())) {
+            logError(modulus.teamName, "Answer is not correct")
+            return
+        }
+
+        val team = teamRepository.getTeamByName(modulus.teamName)
+
+        val answer = Answer(
+            0,
+            team.id,
+            Category.MODULUS.score,
+            modulus.messageId,
+            modulus.questionId,
+            modulus.category,
+            modulus.created,
+        )
+        val create = answerRepository.create(answer)
+        logger.info("Answer created with id: $create for team: ${modulus.teamName}")
+
     }
 
 

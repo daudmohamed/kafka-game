@@ -56,4 +56,6 @@ enum class Category(val score: Int) {
     MIN_MAX(45), // 5 TASKS
     @SerialName("deduplication")
     DEDUPLICATION(60), // 3 TASKS
+    @SerialName("modulus")
+    MODULUS(75), // 5 TASKS
 }
