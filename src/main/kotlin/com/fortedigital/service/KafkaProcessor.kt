@@ -387,10 +387,10 @@ class KafkaProcessor(
     private suspend fun handleDeduplication(message: String) {
         val deduplication = handleCommon<AnswerMessage>(message) ?: return
         val answerValue = deduplication.answer
+        val team = teamRepository.getTeamByName(deduplication.teamName)
 
         when(answerValue) {
             "you wont dupe me!" -> {
-                val team = teamRepository.getTeamByName(deduplication.teamName)
 
                 val answer = Answer(
                     0,
@@ -406,7 +406,7 @@ class KafkaProcessor(
 
             }
             "you duped me!" -> {
-                answerRepository.deleteByQuestionId(deduplication.questionId)
+                answerRepository.deleteByQuestionId(deduplication.questionId, team.id)
             }
             else -> {
                 logError(deduplication.teamName, "Answer is not correct")

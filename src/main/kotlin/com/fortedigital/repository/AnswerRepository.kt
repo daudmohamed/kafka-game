@@ -59,9 +59,9 @@ class AnswerRepository {
         }
     }
 
-    suspend fun deleteByQuestionId(questionId: String) {
+    suspend fun deleteByQuestionId(questionId: String, teamId: Int) {
         dbQuery {
-            AnswerTable.deleteWhere { AnswerTable.questionId.eq(questionId) }
+            AnswerTable.deleteWhere { AnswerTable.questionId.eq(questionId) and AnswerTable.teamId.eq(teamId) }
         }
     }
 
